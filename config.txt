@@ -1,0 +1,13 @@
+M by N : 20 20
+steps: 100
+robots: 10
+RoboCop Jet 1 1
+Terminator Star 3 3
+TerminatorRoboCop Fun 4 4
+BlueThunder Lala 5 5
+MadBot Didi 11 11
+RoboTank Juju 8 3
+UltimateRobot Titi 11 11
+BlueThunder Ququ 3 1
+MadBot Wowo 12 11
+Terminator Pupu 4 12
