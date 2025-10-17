@@ -6,16 +6,16 @@ Name: Adriana binti Meor Azman
 ID: 1211111079
 Email: 1211111079@student.mmu.edu.my
 Phone: 016-7199579
-Name: Issye Lailiyah Binti Sopingi  
-ID: 1231303279  
+Name: Issye Lailiyah Binti Sopingi
+ID: 1231303279
 Email: 1231303279@student.mmu.edu.my
 Phone: 014-3277626
-Name: Zulaikha Afzan Binti Bee Wan  
-ID: 1221102418  
+Name: Zulaikha Afzan Binti Bee Wan
+ID: 1221102418
 Email: 1221102418@student.mmu.edu.my
 Phone: 014-9738597
-Name: Rahaf Khalid Hamed Mohamed Khier  
-ID: 1221303108  
+Name: Rahaf Khalid Hamed Mohamed Khier
+ID: 1221303108
 Email: 1221303108@student.mmu.edu.my
 Phone: 011-62164425
 Lecture Section: TC1L
@@ -29,6 +29,7 @@ Tutorial Section: TT4L
 #include <cstdlib>    // For rand() and srand()
 #include <ctime>      // For time() to seed the random number generator
 #include <vector>
+#include <limits>     // ** NEW INCLUDE FOR THE FIX **
 #include "Battlefield.h"
 #include "Robot.h"
 #include "TerminatorRoboCop.h"
@@ -133,6 +134,12 @@ int main() {
 
     srand(time(0)); // Seed the random number generator
     battlefield.simulate(); // Start the battlefield simulation
+
+    // *** THIS IS THE FIX ***
+    // Add these lines to pause the console before exiting
+    cout << "\n\nPress Enter to exit the simulation...";
+    cin.ignore(numeric_limits<streamsize>::max(), '\n'); // Clear any leftover input
+    cin.get(); // Wait for the user to press Enter
 
     return 0;
 }
