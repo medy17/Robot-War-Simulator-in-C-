@@ -135,7 +135,7 @@ public:
         // If a valid move is found, update the robot's position
         cout << name << " moved to (" << newX << ", " << newY << ")" << endl;
         
-        battlefield->updatePosition(getX(), getY(), newX, newY);
+        battlefield->updatePosition(this, getX(), getY(), newX, newY);
     }
 
     void step() override {

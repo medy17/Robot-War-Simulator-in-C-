@@ -40,8 +40,8 @@ class UltimateRobot;
 
 class TerminatorRoboCop : public RoboCop, public Terminator {
 private:
-    bool enemyFound;
-    int enemyX, enemyY;
+    // This class no longer needs its own enemyFound variables,
+    // it will use the protected ones from the Terminator parent class.
 
 public:
     TerminatorRoboCop(int initX, int initY, string name, Battlefield* battlefield)
@@ -51,8 +51,7 @@ public:
           MovingRobot(initX, initY, name, name[0], battlefield),    // Initialize MovingRobot
           ShootingRobot(initX, initY, name, name[0], battlefield),  // Initialize ShootingRobot
           SeeingRobot(initX, initY, name, name[0], battlefield),    // Initialize SeeingRobot
-          SteppingRobot(initX, initY, name, name[0], battlefield),  // Initialize SteppingRobot
-          enemyFound(false), enemyX(0), enemyY(0) {}
+          SteppingRobot(initX, initY, name, name[0], battlefield) {} // Initialize SteppingRobot
 
 
    void upgradeToUltimateRobot(Robot*& ultimateRobot);
@@ -62,8 +61,22 @@ public:
         Terminator::look(x, y);  // Call Terminator's look method
     }
 
-    void move() override {
-        RoboCop::move();  // Call RoboCop's move method
+    void move() override { // Implement a new "smarter" move method
+        if (enemyFound) {
+            // If look() found an enemy, use the Terminator's move logic to step on it.
+            int oldX = getX();
+            int oldY = getY();
+            // Important: Check if a robot is actually there before trying to get its name
+            if (battlefield->hasRobotAt(enemyX, enemyY)) {
+                enemyName = battlefield->getRobotAt(enemyX, enemyY)->getName();
+                battlefield->removeRobotAt(enemyX, enemyY);
+            }
+            cout << name << " moved to (" << enemyX << ", " << enemyY << ")" << endl;
+            battlefield->updatePosition(this, oldX, oldY, enemyX, enemyY);
+        } else {
+            // Otherwise, move randomly like a RoboCop.
+            RoboCop::move();
+        }
     }
 
    void fire(int x, int y) override {

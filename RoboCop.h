@@ -48,7 +48,7 @@ public:
           SeeingRobot(initX, initY, name, name[0], battlefield) {}
 
     // Method to upgrade RoboCop to TerminatorRoboCop
-    void upgradeToTerminatorRoboCop(Robot* terminatorRoboCop);
+    void upgradeToTerminatorRoboCop(Robot*& terminatorRoboCop);
 
     // Override the look method from SeeingRobot class
     void look(int x, int y) override {
@@ -80,7 +80,7 @@ public:
                 (battlefield->hasRobotAt(newX, newY) && battlefield->getRobotAt(newX, newY)->getName() != getName()));
 
         // Update the robot's position if a valid move is found
-        battlefield->updatePosition(oldX, oldY, newX, newY);
+        battlefield->updatePosition(this, oldX, oldY, newX, newY);
         cout << name << " moved to (" << newX << ", " << newY << ")" << endl;
     }
 
@@ -99,7 +99,6 @@ public:
                     battlefield->removeRobotAt(x, y); // Remove the enemy robot
 
                     if (kills >= 3) {
-                        cout << name << " has upgraded to TerminatorRoboCop!" << endl;
                         resetKills(); // Reset kills
                         Robot* terminatorRoboCop = nullptr;
                         upgradeToTerminatorRoboCop(terminatorRoboCop); // Upgrade to TerminatorRoboCop

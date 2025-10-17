@@ -31,29 +31,18 @@ using namespace std;
 // Function to upgrade terminator into terminatorRoboCop
 void Terminator::upgradeToTerminatorRoboCop(Robot*& terminatorRoboCop) 
 {
-    // Checks if pointer is not null to make sure i thas been initialized and points to a valid
-    // memory locatio
-    if (terminatorRoboCop) 
-    {
-        //Creates new TerminatorRoboCop object using the current Terminator's coordinates
-        // and battlefield reference
-        terminatorRoboCop = new TerminatorRoboCop(getX(), getY(), getName(), battlefield);
+    // Store a pointer to the current (old) robot object.
+    Robot* oldRobot = this;
 
-        // the current Terminator number of lives and kills to the new TerminatorRoboCop object
-        terminatorRoboCop->setLives(getLives());
-        terminatorRoboCop->setKills(getKills());
+    // Create the new, upgraded robot at the old robot's position.
+    terminatorRoboCop = new TerminatorRoboCop(getX(), getY(), getName(), battlefield);
 
-        // Notify and perform upgrade in battlefield
-        cout << getName() << " has upgraded to TerminatorRoboCop!" << endl;
-        battlefield->removeRobotAt(getX(), getY()); // Remove the old Terminator
-        battlefield->addRobot(terminatorRoboCop);   // Add the new TerminatorRoboCop
+    // Transfer stats to the new robot.
+    terminatorRoboCop->setLives(getLives());
 
-        // Reset kills for the new upgraded robot
-        resetKills();
-    } 
-    // Prints error message if terminator is not initialized correctly
-    else 
-    {
-        cout << "Error: TerminatorRoboCop not initialized!" << endl;
-    }
+    cout << getName() << " has upgraded to TerminatorRoboCop!" << endl;
+
+    // Queue the new robot for addition and mark the old one for removal.
+    battlefield->addRobot(terminatorRoboCop);   
+    battlefield->markRobotForRemoval(oldRobot); 
 }

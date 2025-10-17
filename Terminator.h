@@ -38,11 +38,11 @@ using namespace std;
 class TerminatorRoboCop;
 
 class Terminator : public virtual MovingRobot, public virtual SteppingRobot, public virtual SeeingRobot {
-private:
+protected: // Changed from private to allow child class access
     // Store the enemy's name
     string enemyName;
     // Flag to inficate enemy has been found
-    bool enemyFound;
+    bool enemyFound; 
     // Coordinate of the enemy
     int enemyX, enemyY;
 
@@ -142,7 +142,7 @@ public:
         // If a valid move is found, update the robot's position
         cout << name << " moved to (" << newX << ", " << newY << ")" << endl;
         
-        battlefield->updatePosition(getX(), getY(), newX, newY);
+        battlefield->updatePosition(this, getX(), getY(), newX, newY);
     }
 
     void step() override {

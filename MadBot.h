@@ -85,7 +85,6 @@ public:
                 battlefield->removeRobotAt(targetX, targetY); // Remove the enemy robot
 
                 if (kills >= 3) {
-                    cout << name << " has upgraded to RoboTank!" << endl;
                     resetKills(); // Reset kills
                     // Upgrade to RoboTank
                     Robot* roboTank = nullptr;

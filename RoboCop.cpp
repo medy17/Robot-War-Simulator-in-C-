@@ -28,20 +28,18 @@ Tutorial Section: TT4L
 using namespace std;
 
 // Method to upgrade RoboCop to TerminatorRoboCop
-void RoboCop::upgradeToTerminatorRoboCop(Robot* terminatorRoboCop) {
+void RoboCop::upgradeToTerminatorRoboCop(Robot*& terminatorRoboCop) {
+    Robot* oldRobot = this;
+
     // Create a new TerminatorRoboCop object with the current RoboCop's position and name
     terminatorRoboCop = new TerminatorRoboCop(getX(), getY(), getName(), battlefield);
-    cout << name << " has upgraded to TerminatorRoboCop!" << endl;
-
-    resetKills(); // Reset the number of kills for the upgraded robot
 
     // Copy the number of lives and kills from the current RoboCop to the new TerminatorRoboCop
     terminatorRoboCop->setLives(getLives());
-    terminatorRoboCop->setKills(getKills());
+
+    cout << name << " has upgraded to TerminatorRoboCop!" << endl;
 
     // Replace the current RoboCop with the new TerminatorRoboCop on the battlefield
-    battlefield->removeRobotAt(getX(), getY()); // Remove the current RoboCop
-    battlefield->addRobot(terminatorRoboCop);   // Add the new TerminatorRoboCop
-
-    delete this; // Delete the current RoboCop object as it is now replaced
+    battlefield->addRobot(terminatorRoboCop);
+    battlefield->markRobotForRemoval(oldRobot);
 }

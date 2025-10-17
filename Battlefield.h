@@ -28,7 +28,7 @@ Tutorial Section: TT4L
 #include <vector>
 #include <cstdlib>
 #include <ctime>
-#include <algorithm> // Needed for std::remove
+#include <algorithm> // Needed for std::remove and std::find
 #include "Robot.h"
 
 using namespace std;
@@ -38,6 +38,8 @@ private:
     int m, n, steps;
     vector<Robot *> robots;
     vector<Robot *> robotQueue;
+    // A temporary list for robots to be added at the end of a step
+    vector<Robot *> robotsToAdd;
     // A temporary list for robots to be removed at the end of a step
     vector<Robot *> robotsToRemove;
 
@@ -53,25 +55,46 @@ public:
         for (auto robot : robotQueue) {
             delete robot;
         }
-        // Just in case any are left over
+        for (auto robot : robotsToAdd) { // Just in case any are left over
+            delete robot;
+        }
         for (auto robot : robotsToRemove) {
             delete robot;
         }
     }
 
     void addRobot(Robot *robot) {
-        cout << robot->getName() << " is entering the Battlefield at (" << robot->getX() << ", " << robot->getY() << ")" << endl;
-        robots.push_back(robot);
+        // Instead of adding immediately, queue the robot for addition at the end of the step.
+        cout << robot->getName() << " is queued to enter the Battlefield at (" << robot->getX() << ", " << robot->getY() << ")" << endl;
+        robotsToAdd.push_back(robot);
     }
 
     void simulate() {
-        srand(time(nullptr));
+        srand(static_cast<unsigned int>(time(nullptr)));
+
+        // --- Initial Population ---
+        // Add robots from the config file before the simulation starts
+        if (!robotsToAdd.empty()) {
+            for (Robot* toAdd : robotsToAdd) {
+                cout << toAdd->getName() << " is entering the Battlefield at (" << toAdd->getX() << ", " << toAdd->getY() << ")" << endl;
+                robots.push_back(toAdd);
+            }
+            robotsToAdd.clear();
+        }
 
         for (int step = 0; step < steps; step++) {
             cout << "\nStep " << step + 1 << ":\n";
 
             for (size_t i = 0; i < robots.size(); ++i) {
                 Robot *robot = robots[i];
+
+                // --- ZOMBIE CHECK ---
+                // If this robot was killed by another robot earlier in the same step,
+                // it should not get to take its turn.
+                if (std::find(robotsToRemove.begin(), robotsToRemove.end(), robot) != robotsToRemove.end()) {
+                    continue; // Skip this robot's turn, it's a "zombie".
+                }
+
                 if (robot->getLives() > 0) {
                     int randX = rand() % m;
                     int randY = rand() % n;
@@ -99,6 +122,17 @@ public:
                 // We don't delete the pointers here because they are now in the robotQueue
                 robotsToRemove.clear(); // Clear the list for the next step
             }
+
+            // --- ADDITION PHASE ---
+            // Now, safely add all the new robots that were created this step (e.g., from upgrades)
+            if (!robotsToAdd.empty()) {
+                for (Robot* toAdd : robotsToAdd) {
+                     cout << toAdd->getName() << " is now active on the Battlefield." << endl;
+                    robots.push_back(toAdd);
+                }
+                robotsToAdd.clear(); // Clear the list for the next step
+            }
+
 
             // Reactivate destroyed robots from the queue
             if (!robotQueue.empty()) {
@@ -180,14 +214,19 @@ public:
         }
     }
 
-    void updatePosition(int oldX, int oldY, int newX, int newY) {
-        for (Robot *robot : robots) {
-            if (robot->getX() == oldX && robot->getY() == oldY) {
-                cout << robot->getName() << " has moved from (" << oldX << ", " << oldY << ") to (" << newX << ", " << newY << ")" << endl;
-                robot->setPosition(newX, newY);
-                return;
-            }
+    // A new, safer way to mark a robot for removal using its pointer.
+    // This avoids the ambiguity of removing by coordinates during an upgrade.
+    void markRobotForRemoval(Robot* robot) {
+        cout << "Marking " << robot->getName() << " (" << robot << ") for removal." << endl;
+        if (std::find(robotsToRemove.begin(), robotsToRemove.end(), robot) == robotsToRemove.end()) {
+            robotsToRemove.push_back(robot);
         }
+    }
+
+    void updatePosition(Robot* movingRobot, int oldX, int oldY, int newX, int newY) {
+        // This is now unambiguous. We know exactly which robot is moving.
+        cout << movingRobot->getName() << " has moved from (" << oldX << ", " << oldY << ") to (" << newX << ", " << newY << ")" << endl;
+        movingRobot->setPosition(newX, newY);
     }
 };
 #endif

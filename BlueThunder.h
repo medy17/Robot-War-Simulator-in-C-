@@ -105,7 +105,6 @@ public:
 
                 // Check if BlueThunder has enough kills to upgrade to MadBot
                 if (kills >= 3) {
-                    cout << name << " has upgraded to MadBot!" << endl;
                     resetKills(); // Reset the kill count
                     Robot* madBot = nullptr; // Initialize the MadBot pointer
                     upgradeToMadBot(madBot); // Call the upgrade function
