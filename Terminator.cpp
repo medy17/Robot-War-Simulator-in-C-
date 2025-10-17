@@ -28,21 +28,16 @@ Tutorial Section: TT4L
 #include <iostream>
 using namespace std;
 
-// Function to upgrade terminator into terminatorRoboCop
 void Terminator::upgradeToTerminatorRoboCop(Robot*& terminatorRoboCop) 
 {
-    // Store a pointer to the current (old) robot object.
     Robot* oldRobot = this;
 
-    // Create the new, upgraded robot at the old robot's position.
     terminatorRoboCop = new TerminatorRoboCop(getX(), getY(), getName(), battlefield);
 
-    // Transfer stats to the new robot.
     terminatorRoboCop->setLives(getLives());
 
     cout << getName() << " has upgraded to TerminatorRoboCop!" << endl;
 
-    // Queue the new robot for addition and mark the old one for removal.
     battlefield->addRobot(terminatorRoboCop);   
     battlefield->markRobotForRemoval(oldRobot); 
 }

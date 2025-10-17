@@ -28,7 +28,6 @@ Tutorial Section: TT4L
 #include <iostream>
 using namespace std;
 
-// Function to upgrade RoboTank to ultimate robot
 void RoboTank::upgradeToUltimateRobot(Robot*& ultimateRobot){
     Robot* oldRobot = this;
 

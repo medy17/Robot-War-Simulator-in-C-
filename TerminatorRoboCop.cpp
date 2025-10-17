@@ -28,7 +28,6 @@ Tutorial Section: TT4L
 #include <iostream>
 using namespace std;
 
-// Function to upgrade TerminatorRoboCop to ultimate robot
 void TerminatorRoboCop::upgradeToUltimateRobot(Robot*& ultimateRobot){
     Robot* oldRobot = this;
     

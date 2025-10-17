@@ -29,20 +29,15 @@ Tutorial Section: TT4L
 #include <string>
 using namespace std;
 
-// Method to upgrade a BlueThunder robot to a MadBot
 void BlueThunder::upgradeToMadBot(Robot*& madBot) {
     Robot* oldRobot = this;
 
-    // Create a new MadBot at the current position of the BlueThunder robot
     madBot = new MadBot(getX(), getY(), getName(), battlefield);
 
-    // Transfer the lives from the current BlueThunder robot to the new MadBot
     madBot->setLives(getLives());
 
-    // Output a message indicating the upgrade
     cout << name << " has upgraded to MadBot!" << endl;
 
-    // Queue the new robot for addition and mark the old one for removal.
     battlefield->addRobot(madBot);
     battlefield->markRobotForRemoval(oldRobot);
 }

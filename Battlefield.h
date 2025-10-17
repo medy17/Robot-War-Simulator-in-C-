@@ -28,7 +28,7 @@ Tutorial Section: TT4L
 #include <vector>
 #include <cstdlib>
 #include <ctime>
-#include <algorithm> // Needed for std::remove and std::find
+#include <algorithm>
 #include "Robot.h"
 
 using namespace std;
@@ -38,9 +38,7 @@ private:
     int m, n, steps;
     vector<Robot *> robots;
     vector<Robot *> robotQueue;
-    // A temporary list for robots to be added at the end of a step
     vector<Robot *> robotsToAdd;
-    // A temporary list for robots to be removed at the end of a step
     vector<Robot *> robotsToRemove;
 
 public:
@@ -55,7 +53,7 @@ public:
         for (auto robot : robotQueue) {
             delete robot;
         }
-        for (auto robot : robotsToAdd) { // Just in case any are left over
+        for (auto robot : robotsToAdd) {
             delete robot;
         }
         for (auto robot : robotsToRemove) {
@@ -64,7 +62,6 @@ public:
     }
 
     void addRobot(Robot *robot) {
-        // Instead of adding immediately, queue the robot for addition at the end of the step.
         cout << robot->getName() << " is queued to enter the Battlefield at (" << robot->getX() << ", " << robot->getY() << ")" << endl;
         robotsToAdd.push_back(robot);
     }
@@ -72,8 +69,6 @@ public:
     void simulate() {
         srand(static_cast<unsigned int>(time(nullptr)));
 
-        // --- Initial Population ---
-        // Add robots from the config file before the simulation starts
         if (!robotsToAdd.empty()) {
             for (Robot* toAdd : robotsToAdd) {
                 cout << toAdd->getName() << " is entering the Battlefield at (" << toAdd->getX() << ", " << toAdd->getY() << ")" << endl;
@@ -88,11 +83,8 @@ public:
             for (size_t i = 0; i < robots.size(); ++i) {
                 Robot *robot = robots[i];
 
-                // --- ZOMBIE CHECK ---
-                // If this robot was killed by another robot earlier in the same step,
-                // it should not get to take its turn.
                 if (std::find(robotsToRemove.begin(), robotsToRemove.end(), robot) != robotsToRemove.end()) {
-                    continue; // Skip this robot's turn, it's a "zombie".
+                    continue;
                 }
 
                 if (robot->getLives() > 0) {
@@ -107,34 +99,26 @@ public:
                 } else {
                     cout << "Robot destroyed: " << robot->getName() << ". Adding to queue." << endl;
                     robotQueue.push_back(robot);
-                    // Mark for removal instead of deleting immediately
                     robotsToRemove.push_back(robot);
                 }
             }
 
-            // --- SWEEP PHASE ---
-            // Now, safely remove all the robots that were marked for deletion
             if (!robotsToRemove.empty()) {
                 for (Robot* toRemove : robotsToRemove) {
-                    // The erase-remove idiom is a standard way to remove elements
                     robots.erase(std::remove(robots.begin(), robots.end(), toRemove), robots.end());
                 }
-                // We don't delete the pointers here because they are now in the robotQueue
-                robotsToRemove.clear(); // Clear the list for the next step
+                robotsToRemove.clear();
             }
 
-            // --- ADDITION PHASE ---
-            // Now, safely add all the new robots that were created this step (e.g., from upgrades)
             if (!robotsToAdd.empty()) {
                 for (Robot* toAdd : robotsToAdd) {
                      cout << toAdd->getName() << " is now active on the Battlefield." << endl;
                     robots.push_back(toAdd);
                 }
-                robotsToAdd.clear(); // Clear the list for the next step
+                robotsToAdd.clear();
             }
 
 
-            // Reactivate destroyed robots from the queue
             if (!robotQueue.empty()) {
                 Robot *reactivatedRobot = robotQueue.front();
                 robotQueue.erase(robotQueue.begin());
@@ -194,8 +178,6 @@ public:
         return nullptr;
     }
 
-    // --- MODIFIED REMOVE FUNCTION ---
-    // Instead of deleting, we "mark" the robot for deletion.
     void removeRobotAt(int x, int y) {
         Robot* robotToMark = nullptr;
         for (auto it = robots.begin(); it != robots.end(); ++it) {
@@ -207,15 +189,12 @@ public:
 
         if (robotToMark != nullptr) {
             cout << "Marking " << robotToMark->getName() << " at (" << x << ", " << y << ") for removal." << endl;
-            // Add to the list, but avoid adding duplicates
             if (std::find(robotsToRemove.begin(), robotsToRemove.end(), robotToMark) == robotsToRemove.end()) {
                 robotsToRemove.push_back(robotToMark);
             }
         }
     }
 
-    // A new, safer way to mark a robot for removal using its pointer.
-    // This avoids the ambiguity of removing by coordinates during an upgrade.
     void markRobotForRemoval(Robot* robot) {
         cout << "Marking " << robot->getName() << " (" << robot << ") for removal." << endl;
         if (std::find(robotsToRemove.begin(), robotsToRemove.end(), robot) == robotsToRemove.end()) {
@@ -224,7 +203,6 @@ public:
     }
 
     void updatePosition(Robot* movingRobot, int oldX, int oldY, int newX, int newY) {
-        // This is now unambiguous. We know exactly which robot is moving.
         cout << movingRobot->getName() << " has moved from (" << oldX << ", " << oldY << ") to (" << newX << ", " << newY << ")" << endl;
         movingRobot->setPosition(newX, newY);
     }
